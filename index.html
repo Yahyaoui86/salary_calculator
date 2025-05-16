@@ -5,8 +5,9 @@
   <title>Salary Calculator</title>
   <style>
     body { font-family: Arial; padding: 20px; }
-    input, select { margin: 8px 0; padding: 5px; width: 200px; }
-    label { display: block; margin-top: 15px; }
+    input, label { display: block; margin-top: 10px; width: 300px; }
+    input { padding: 5px; }
+    button { margin-top: 20px; padding: 10px 20px; }
     .result { margin-top: 20px; font-weight: bold; }
   </style>
 </head>
@@ -26,8 +27,17 @@
   <label>Transportation Allowance (Default AED 350)</label>
   <input type="number" id="transport" value="350">
 
+  <label>Mobile Allowance (Default AED 0)</label>
+  <input type="number" id="mobile" value="0">
+
+  <label>Ticket Allowance (Default AED 0)</label>
+  <input type="number" id="ticket" value="0">
+
   <label>Total Overtime Hours</label>
   <input type="number" id="overtime" value="0">
+
+  <label>Public Holiday Hours</label>
+  <input type="number" id="holiday" value="0">
 
   <label>Undertime/Absence (in Hours)</label>
   <input type="number" id="undertime" value="0">
@@ -45,27 +55,38 @@
       const basic = parseFloat(document.getElementById('basic').value);
       const allowance = parseFloat(document.getElementById('allowance').value);
       const transport = parseFloat(document.getElementById('transport').value);
+      const mobile = parseFloat(document.getElementById('mobile').value);
+      const ticket = parseFloat(document.getElementById('ticket').value);
       const overtime = parseFloat(document.getElementById('overtime').value);
+      const holiday = parseFloat(document.getElementById('holiday').value);
       const undertime = parseFloat(document.getElementById('undertime').value);
       const expenses = parseFloat(document.getElementById('expenses').value);
 
       const workingHoursPerDay = 8;
-      const multiplier = 1.25;
+      const overtimeMultiplier = 1.25;
+      const holidayMultiplier = 1.5;
 
-      // Overtime calculation
-      const baseOvertimeRate = (multiplier * (basic + allowance)) / (days * workingHoursPerDay);
-      const overtimePay = baseOvertimeRate * overtime;
+      const totalBase = basic + allowance;
 
-      // Undertime deduction
-      const undertimeDeduction = ((basic + allowance) / (days * workingHoursPerDay)) * undertime;
+      // Overtime and Holiday Pay
+      const overtimeRate = (overtimeMultiplier * totalBase) / (days * workingHoursPerDay);
+      const holidayRate = (holidayMultiplier * totalBase) / (days * workingHoursPerDay);
 
-      // Final salary
-      const finalSalary = basic + allowance + transport + overtimePay + expenses - undertimeDeduction;
+      const overtimePay = overtimeRate * overtime;
+      const holidayPay = holidayRate * holiday;
+
+      // Undertime Deduction
+      const undertimeDeduction = (totalBase / (days * workingHoursPerDay)) * undertime;
+
+      // Final Salary
+      const finalSalary = basic + allowance + transport + mobile + ticket +
+                          overtimePay + holidayPay + expenses - undertimeDeduction;
 
       document.getElementById('output').innerHTML = `
         Overtime Pay: AED ${overtimePay.toFixed(2)}<br>
-        Undertime Deduction: AED ${undertimeDeduction.toFixed(2)}<br>
-        <strong>Final Salary: AED ${finalSalary.toFixed(2)}</strong>
+        Public Holiday Pay: AED ${holidayPay.toFixed(2)}<br>
+        Undertime Deduction: AED ${undertimeDeduction.toFixed(2)}<br><br>
+        <strong>Total Salary: AED ${finalSalary.toFixed(2)}</strong>
       `;
     }
   </script>
